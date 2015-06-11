@@ -1,6 +1,8 @@
 (ns n-queens.core
   (:gen-class))
 
+;;(set! *warn-on-reflection* true)
+
 (def solutions (atom []))
 
 (defn row-conflict?
@@ -19,8 +21,8 @@
         queen-column (queen :column)]
     (some
       #(=
-        (Math/abs (- queen-row (%1 :row)))
-        (Math/abs (- queen-column (%1 :column))))
+        (Math/abs #^int (- queen-row (%1 :row)))
+        (Math/abs #^int (- queen-column (%1 :column))))
       board)))
 
 (defn can-place?
@@ -62,6 +64,11 @@
     #(solve (conj board queen) (next-queen queen) size)
     #(solve board (move-queen queen) size)))
 
+(defn count-solutions
+  [size]
+  (println (count
+             (trampoline (solve () {:row 0 :column 0} size)))))
+
 (defn -main
   [& args]
-  (println (count (trampoline solve [] {:row 0 :column 0} (Integer. (first args))))))
+  (time (count-solutions (Integer/parseInt (first args)))))
